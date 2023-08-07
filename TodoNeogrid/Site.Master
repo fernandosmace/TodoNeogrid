@@ -1,0 +1,299 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="TodoNeogrid.SiteMaster" %>
+
+<!DOCTYPE html>
+
+<% 
+%>
+<html lang="pt">
+<head runat="server">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%: Page.Title %> - Meu aplicativo ASP.NET</title>
+
+    <asp:PlaceHolder runat="server">
+        <%: Scripts.Render("~/bundles/modernizr") %>
+    </asp:PlaceHolder>
+
+    <webopt:BundleReference runat="server" Path="~/Content/css" />
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function adicionarTarefa() {
+            Swal.fire({
+                title: 'Informe a tarefa deseja adicionar',
+                html:
+                    '<div style="margin-left: 5%; margin-right: 5%; margin-top: 1%">' +
+                    '<div class="input-group input-group-sm">' +
+                    '<div class="form-floating mb-3">' +
+                    '<input type="email" class="form-control mw-100" id="novaTarefaTituloInput" placeholder="Título">' +
+                    '<label for="novaTarefaTituloLbl">Título</label>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="input-group input-group-sm">' +
+                    '<div class="form-floating mb-3">' +
+                    '<textarea class="form-control mw-100" placeholder="Descrição" id="novaTarefaDescricaoInput"></textarea>' +
+                    '<label for="novaTarefaDescricaoLbl">Descrição</label>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+                ,
+                showCancelButton: true,
+                confirmButtonText: 'Salvar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: () => {
+                    return $.ajax({
+                        type: "POST",
+                        url: "Default.aspx/AdicionarTodo",
+                        data: JSON.stringify({
+                            titulo: document.getElementById('novaTarefaTituloInput').value,
+                            descricao: document.getElementById('novaTarefaDescricaoInput').value
+                        }),
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        success: function () {
+                            let timerInterval
+                            Swal.fire({
+                                title: 'Sucesso!',
+                                text: 'Tarefa adicionada com sucesso!',
+                                icon: 'success',
+                                timer: 2000,
+                                timerProgressBar: true,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                    const b = Swal.getHtmlContainer().querySelector('b')
+                                    timerInterval = setInterval(() => {
+                                        b.textContent = Swal.getTimerLeft()
+                                    }, 100)
+                                },
+                                willClose: () => {
+                                    clearInterval(timerInterval)
+                                }
+                            }).then((result) => {
+                                window.location.reload();
+                            })
+                        },
+                        error: function (req,) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Falha ao adicionar tarefa',
+                                text: JSON.parse(req.responseText),
+                                footer: 'Contate a nossa equipe de suporte'
+                            })
+                        }
+                    });
+                },
+            })
+        }
+
+        function editarTarefa(e) {
+            let titulo = document.getElementById(e.id).dataset.titulo;
+            let descricao = document.getElementById(e.id).dataset.titulo;
+
+            Swal.fire({
+                title: 'Edição de tarefa',
+                html:
+                    '<div style="margin-left: 5%; margin-right: 5%; margin-top: 1%">' +
+                    '<div class="input-group input-group-sm">' +
+                    '<div class="form-floating mb-3">' +
+                    '<input type="email" class="form-control mw-100" id="editarTarefaTituloInput" placeholder="Título" value="'+titulo+'">' +
+                    '<label for="editarTarefaTituloLbl">Título</label>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="input-group input-group-sm">' +
+                    '<div class="form-floating mb-3">' +
+                    '<textarea class="form-control mw-100" placeholder="Descrição" id="editarTarefaDescricaoInput">'+descricao+'</textarea>' +
+                    '<label for="editarTarefaDescricaoLbl">Descrição</label>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+                ,
+                showCancelButton: true,
+                confirmButtonText: 'Salvar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: () => {
+                    return $.ajax({
+                        type: "POST",
+                        url: "Default.aspx/EditarTodo",
+                        data: JSON.stringify({
+                            id: e.id.replace("btnEditar-", ""),
+                            titulo: document.getElementById('editarTarefaTituloInput').value,
+                            descricao: document.getElementById('editarTarefaDescricaoInput').value
+                        }),
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        success: function () {
+                            let timerInterval
+                            Swal.fire({
+                                title: 'Sucesso!',
+                                text: 'Tarefa editada com sucesso!',
+                                icon: 'success',
+                                timer: 2000,
+                                timerProgressBar: true,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                    const b = Swal.getHtmlContainer().querySelector('b')
+                                    timerInterval = setInterval(() => {
+                                        b.textContent = Swal.getTimerLeft()
+                                    }, 100)
+                                },
+                                willClose: () => {
+                                    clearInterval(timerInterval)
+                                }
+                            }).then((result) => {
+                                window.location.reload();
+                            })
+                        },
+                        error: function (req,) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Falha ao editar a tarefa',
+                                text: JSON.parse(req.responseText),
+                                footer: 'Contate a nossa equipe de suporte'
+                            })
+                        }
+                    });
+                },
+            })
+        }
+
+        function alterarStatusTarefa(e) {
+            $.ajax({
+                type: "POST",
+                url: "Default.aspx/AlteraStatusTodo",
+                data: JSON.stringify({
+                    id: e.id.replace("btnEditar-", ""),
+                    status: e.checked
+                }),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function () {
+                    let timerInterval
+                    Swal.fire({
+                        title: 'Sucesso!',
+                        text: 'Status da tarefa editado com sucesso!',
+                        icon: 'success',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        didOpen: () => {
+                            Swal.showLoading()
+                            const b = Swal.getHtmlContainer().querySelector('b')
+                            timerInterval = setInterval(() => {
+                                b.textContent = Swal.getTimerLeft()
+                            }, 100)
+                        },
+                        willClose: () => {
+                            clearInterval(timerInterval)
+                        }
+                    }).then((result) => {
+                        window.location.reload();
+                    })
+                },
+                error: function (req,) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Falha ao alterar o status da tarefa',
+                        text: JSON.parse(req.responseText),
+                        footer: 'Contate a nossa equipe de suporte'
+                    })
+                }
+            });
+        }
+
+        function excluirTarefa(e) {
+            Swal.fire({
+                title: 'Você tem certeza que deseja excluir essa tarefa?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sim',
+                cancelButtonText: 'Não'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: "Default.aspx/ExcluirTodo",
+                        data: JSON.stringify({ id: e.id.replace("btnExcluir-", "") }),
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        success: function () {
+                            let timerInterval
+                            Swal.fire({
+                                title: 'Sucesso!',
+                                text: 'Excluído com sucesso!',
+                                icon: 'success',
+                                timer: 1500,
+                                timerProgressBar: true,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                    const b = Swal.getHtmlContainer().querySelector('b')
+                                    timerInterval = setInterval(() => {
+                                        b.textContent = Swal.getTimerLeft()
+                                    }, 100)
+                                },
+                                willClose: () => {
+                                    clearInterval(timerInterval)
+                                }
+                            }).then((result) => {
+                                window.location.reload();
+                            })
+                        },
+                        error: function (req,) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Falha ao excluir tarefa',
+                                text: JSON.parse(req.responseText),
+                                footer: 'Contate a nossa equipe de suporte'
+                            })
+                        }
+                    });
+                }
+            })
+
+
+        }
+    </script>
+</head>
+<body>
+    <form runat="server">
+        <asp:ScriptManager runat="server">
+            <Scripts>
+                <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>
+                <%--Framework Scripts--%>
+                <asp:ScriptReference Name="MsAjaxBundle" />
+                <asp:ScriptReference Name="jquery" />
+                <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
+                <asp:ScriptReference Name="WebUIValidation.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebUIValidation.js" />
+                <asp:ScriptReference Name="MenuStandards.js" Assembly="System.Web" Path="~/Scripts/WebForms/MenuStandards.js" />
+                <asp:ScriptReference Name="GridView.js" Assembly="System.Web" Path="~/Scripts/WebForms/GridView.js" />
+                <asp:ScriptReference Name="DetailsView.js" Assembly="System.Web" Path="~/Scripts/WebForms/DetailsView.js" />
+                <asp:ScriptReference Name="TreeView.js" Assembly="System.Web" Path="~/Scripts/WebForms/TreeView.js" />
+                <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
+                <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
+                <asp:ScriptReference Name="WebFormsBundle" />
+                <%--Site Scripts--%>
+            </Scripts>
+        </asp:ScriptManager>
+
+        <nav class="navbar navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand">To Do - Case Neogrid</a>
+            </div>
+        </nav>
+
+        <div class="container body-content">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server">
+            </asp:ContentPlaceHolder>
+            <hr />
+            <footer>
+                <p>&copy; <%: DateTime.Now.Year %> - To Do - Case Neogrid</p>
+            </footer>
+        </div>
+    </form>
+    <asp:PlaceHolder runat="server">
+        <%: Scripts.Render("~/Scripts/bootstrap.js") %>
+    </asp:PlaceHolder>
+</body>
+</html>
