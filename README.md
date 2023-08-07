@@ -37,6 +37,7 @@ git clone https://github.com/fernandosmace/TodoNeogrid.git
 
 - Altere o campo a ConnectionString no arquivo **Web.Config** localizado na raíz do projeto Web para a do seu banco de dados MySql.
 
+- Obs: Não é necessário informar o banco de dados, uma vez que este é definido pela aplicação. Basta informar o servidor, usuário e senha.
 ```xml
   <connectionStrings>
     <add name="ConnectionString" connectionString="Server={server},3306;User Id={usuario};Password={senha}" />
