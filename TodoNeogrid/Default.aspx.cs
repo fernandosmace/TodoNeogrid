@@ -38,13 +38,25 @@ namespace TodoNeogrid
             {
                 response.Clear();
                 response.ContentType = "application/json; charset=utf-8";
-                response.StatusCode = 500;
+                response.StatusCode = 400;
                 response.Write(js.Serialize("O titulo e descrição devem ser preenchidos."));
                 response.Flush();
                 response.End();
             }
 
             var _todoService = new TodoService();
+
+            var todo = _todoService.GetTodo(titulo, descricao);
+            if (todo != null)
+            {
+                response.Clear();
+                response.ContentType = "application/json; charset=utf-8";
+                response.StatusCode = 400;
+                response.Write(js.Serialize("Já existe uma tarefa com o título e descrição informados."));
+                response.Flush();
+                response.End();
+            }
+
             _todoService.AdicionarTodo(titulo, descricao);
         }
 
@@ -64,13 +76,25 @@ namespace TodoNeogrid
             {
                 response.Clear();
                 response.ContentType = "application/json; charset=utf-8";
-                response.StatusCode = 500;
+                response.StatusCode = 400;
                 response.Write(js.Serialize("O titulo e descrição devem ser preenchidos."));
                 response.Flush();
                 response.End();
             }
 
             var _todoService = new TodoService();
+
+            var todo = _todoService.GetTodo(titulo, descricao);
+            if (todo != null & !todo.Id.Equals(id))
+            {
+                response.Clear();
+                response.ContentType = "application/json; charset=utf-8";
+                response.StatusCode = 400;
+                response.Write(js.Serialize("Já existe uma tarefa com o título e descrição informados."));
+                response.Flush();
+                response.End();
+            }
+
             _todoService.EditarTodo(id, titulo, descricao);
         }
 

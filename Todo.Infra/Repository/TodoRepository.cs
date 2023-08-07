@@ -43,6 +43,44 @@ namespace TodoNeogrid.Infra.Repository
 
             }
         }
+        public Todo GetTodo(string titulo, string descricao)
+        {
+            try
+            {
+                using (var conexao = _context.CriarConexao())
+                {
+                    var query = $@"
+                                  SELECT	*
+                                  FROM ToDo.Todo t 
+                                  WHERE t.Titulo = @titulo AND t.Descricao = @descricao AND t.Excluido = 0;";
+
+                    var resultado = conexao.Query<TodoMap>(
+                        new CommandDefinition(
+                        query,
+                        new
+                        {
+                            titulo,
+                            descricao
+                        }))
+                        .FirstOrDefault();
+
+                    if (resultado == null)
+                        return null;
+
+                    return new Todo(
+                            Guid.Parse(resultado.Id),
+                            resultado.Titulo,
+                            resultado.Descricao,
+                            resultado.Concluido,
+                            resultado.Excluido
+                        );
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
 
         public List<Todo> GetTodoList()
         {

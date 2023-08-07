@@ -13,6 +13,12 @@ namespace TodoNeogrid.Services
         {
             _todoRepository.CriarBancoDeDados();
         }
+        public Todo GetTodo(string titulo, string descricao)
+        {
+            var todo = _todoRepository.GetTodo(titulo, descricao);
+
+            return todo;
+        }
 
         public List<Todo> GetTodos()
         {
